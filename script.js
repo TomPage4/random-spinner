@@ -16,20 +16,29 @@ function addName() {
 }
 
 function createSegment(name, index, total) {
-    const segmentAngle = 360 / total;
-    const rotation = index * segmentAngle;
-    
     const segment = document.createElement('div');
     segment.className = 'wheel-segment';
-    segment.style.transform = `rotate(${rotation}deg) skewY(${90 - segmentAngle}deg)`;
-    segment.style.backgroundColor = colors[index % colors.length];
     
-    const text = document.createElement('div');
-    text.className = 'segment-text';
+    // Calculate the angle for this segment
+    const segmentAngle = 360 / total;
+    const rotationAngle = index * segmentAngle;
+    
+    // Set the segment's rotation
+    segment.style.transform = `rotate(${rotationAngle}deg)`;
+    
+    // Create the colored content div
+    const content = document.createElement('div');
+    content.className = 'segment-content';
+    content.style.transform = `rotate(${segmentAngle}deg)`;
+    content.style.backgroundColor = colors[index % colors.length];
+    
+    // Create and position the text
+    const text = document.createElement('span');
     text.textContent = name;
-    text.style.transform = `skewY(${segmentAngle - 90}deg) rotate(${segmentAngle / 2}deg)`;
+    text.style.transform = `rotate(${-rotationAngle - segmentAngle/2}deg)`;
     
-    segment.appendChild(text);
+    content.appendChild(text);
+    segment.appendChild(content);
     return segment;
 }
 
@@ -43,16 +52,13 @@ function updateWheel() {
         segment.className = 'wheel-segment';
         segment.style.width = '100%';
         segment.style.height = '100%';
-        segment.style.right = '0';
-        segment.style.bottom = '0';
-        segment.style.transform = 'none';
         segment.style.backgroundColor = colors[0];
+        segment.style.display = 'flex';
+        segment.style.alignItems = 'center';
+        segment.style.justifyContent = 'center';
         
-        const text = document.createElement('div');
-        text.className = 'segment-text';
-        text.style.transform = 'none';
+        const text = document.createElement('span');
         text.textContent = names[0];
-        
         segment.appendChild(text);
         wheel.appendChild(segment);
     } else {
