@@ -15,53 +15,44 @@ function addName() {
     }
 }
 
-function createSegment(name, index, total) {
-    const segmentAngle = 360 / total;
-    const rotation = index * segmentAngle;
-    
-    const segment = document.createElement('div');
-    segment.className = 'wheel-segment';
-    segment.style.transform = `rotate(${rotation}deg) skewY(${90 - segmentAngle}deg)`;
-    segment.style.backgroundColor = colors[index % colors.length];
-    
-    const text = document.createElement('div');
-    text.className = 'segment-text';
-    text.textContent = name;
-    text.style.transform = `skewY(${segmentAngle - 90}deg) rotate(${segmentAngle / 2}deg)`;
-    
-    segment.appendChild(text);
-    return segment;
+function createConicGradient(total) {
+    const angle = 360 / total;
+    let gradient = '';
+    names.forEach((_, index) => {
+        const color = colors[index % colors.length];
+        const start = angle * index;
+        const end = angle * (index + 1);
+        gradient += `${color} ${start}deg ${end}deg${index < total - 1 ? ',' : ''}`;
+    });
+    return `conic-gradient(${gradient})`;
 }
 
 function updateWheel() {
     const wheel = document.getElementById('wheel');
     wheel.innerHTML = '';
     
-    if (names.length === 1) {
-        // Special case for single name - fill the entire wheel
+    if (names.length === 0) return;
+
+    // Create conic gradient background
+    wheel.style.background = createConicGradient(names.length);
+    
+    // Create segments with text
+    names.forEach((name, index) => {
         const segment = document.createElement('div');
         segment.className = 'wheel-segment';
-        segment.style.width = '100%';
-        segment.style.height = '100%';
-        segment.style.right = '0';
-        segment.style.bottom = '0';
-        segment.style.transform = 'none';
-        segment.style.backgroundColor = colors[0];
         
-        const text = document.createElement('div');
-        text.className = 'segment-text';
-        text.style.transform = 'none';
-        text.textContent = names[0];
+        const content = document.createElement('div');
+        content.className = 'segment-content';
         
-        segment.appendChild(text);
+        const angle = 360 / names.length;
+        const rotation = angle * index + (angle / 2);
+        
+        content.style.transform = `rotate(${rotation}deg)`;
+        content.textContent = name;
+        
+        segment.appendChild(content);
         wheel.appendChild(segment);
-    } else {
-        // Multiple names - create proper segments
-        names.forEach((name, index) => {
-            const segment = createSegment(name, index, names.length);
-            wheel.appendChild(segment);
-        });
-    }
+    });
 }
 
 function spinWheel() {
